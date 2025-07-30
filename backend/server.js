@@ -33,9 +33,7 @@ app.use('/api/', limiter);
 
 // CORS configuration
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? ['https://your-frontend-domain.com'] 
-    : ['http://localhost:3000', 'http://localhost:5173'],
+  origin: true, // Allow all origins for now
   credentials: true
 }));
 
