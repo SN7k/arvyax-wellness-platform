@@ -100,6 +100,7 @@ const Register: React.FC = () => {
                 onChange={handleChange}
                 className={`input-field ${errors.name ? 'border-red-300 focus:ring-red-500' : ''}`}
                 placeholder="Enter your full name"
+                autoComplete="name"
               />
               {errors.name && (
                 <p className="mt-1 text-sm text-red-600">{errors.name}</p>
@@ -118,6 +119,7 @@ const Register: React.FC = () => {
                 onChange={handleChange}
                 className={`input-field ${errors.email ? 'border-red-300 focus:ring-red-500' : ''}`}
                 placeholder="Enter your email"
+                autoComplete="email"
               />
               {errors.email && (
                 <p className="mt-1 text-sm text-red-600">{errors.email}</p>
@@ -137,6 +139,7 @@ const Register: React.FC = () => {
                   onChange={handleChange}
                   className={`input-field pr-10 ${errors.password ? 'border-red-300 focus:ring-red-500' : ''}`}
                   placeholder="Create a password"
+                  autoComplete="new-password"
                 />
                 <button
                   type="button"
@@ -164,6 +167,7 @@ const Register: React.FC = () => {
                   onChange={handleChange}
                   className={`input-field pr-10 ${errors.confirmPassword ? 'border-red-300 focus:ring-red-500' : ''}`}
                   placeholder="Confirm your password"
+                  autoComplete="new-password"
                 />
                 <button
                   type="button"

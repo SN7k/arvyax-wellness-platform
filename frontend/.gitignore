@@ -1,13 +1,19 @@
-# Node modules
+# Dependencies
 node_modules/
 
 # Environment variables
 .env
-.env.*
+.env.local
+.env.production
 
 # Build output
 dist/
-build/
+
+# Vite cache
+.vite/
+
+# Logs
+*.log
 
 # OS files
 .DS_Store
@@ -15,5 +21,5 @@ Thumbs.db
 
 # Editor files
 .vscode/
-.idea/
 *.swp
+
