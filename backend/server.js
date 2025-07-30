@@ -13,6 +13,9 @@ dotenv.config();
 
 const app = express();
 
+// Trust proxy - Fix for X-Forwarded-For header error on hosting platforms
+app.set('trust proxy', 1);
+
 // Connect to MongoDB
 connectDB();
 
