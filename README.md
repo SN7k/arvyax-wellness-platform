@@ -1,6 +1,4 @@
-# Arvyax Wellness Platform
-
-A secure, full-stack platform for creating, drafting, and publishing wellness sessions (yoga, meditation, etc.) with authentication, auto-save, and a modern UI.
+# Arvyax Wellness Platform [🌐 Live Demo](https://arvyaxwellness.netlify.app/)
 
 ---
 
@@ -142,5 +140,3 @@ Arvyax Full Stack Internship Assignment
 
 ---
 
-## 🌐 Live Demo
-- **Frontend:** [Netlify Deployment](https://arvyax-wellness-platform.netlify.app)
