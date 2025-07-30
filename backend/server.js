@@ -35,11 +35,28 @@ const limiter = rateLimit({
 app.use('/api/', limiter);
 
 // CORS configuration
+const allowedOrigins = [
+  'https://arvyaxwellness.netlify.app',
+  'http://localhost:3000',
+  'http://localhost:5173',
+  'http://localhost:5174'
+];
+
 app.use(cors({
-  origin:  process.env.NODE_ENV === 'production' 
-    ? ['https://arvyaxwellness.netlify.app/', 'http://localhost:5173', 'http://localhost:5174'] 
-    : ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:5174'], 
-  credentials: true
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, Postman, etc.)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      console.log('Blocked origin:', origin);
+      return callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 // Body parsing middleware
