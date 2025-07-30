@@ -116,28 +116,50 @@ router.post('/my-sessions/save-draft', authMiddleware, [
         });
       }
 
+      // Update the existing session
       session = await Session.findOneAndUpdate(
         { _id: sessionId, user_id: req.user._id },
         {
           title,
           tags: Array.isArray(tags) ? tags.filter(tag => tag.trim()) : [],
           json_file_url,
-          // Keep existing status if published, otherwise set to draft
-          status: existingSession.status === 'published' ? 'published' : 'draft'
+          // Keep existing status - don't change it
+          status: existingSession.status
         },
         { new: true, runValidators: true }
       );
     } else {
-      // Create new session
-      session = new Session({
+      // Create new session - check for potential duplicates by title (optional check)
+      const existingTitleSession = await Session.findOne({
         user_id: req.user._id,
-        title,
-        tags: Array.isArray(tags) ? tags.filter(tag => tag.trim()) : [],
-        json_file_url,
+        title: title.trim(),
         status: 'draft'
       });
 
-      await session.save();
+      if (existingTitleSession) {
+        // If there's already a draft with the same title, update it instead of creating new
+        session = await Session.findOneAndUpdate(
+          { _id: existingTitleSession._id },
+          {
+            title,
+            tags: Array.isArray(tags) ? tags.filter(tag => tag.trim()) : [],
+            json_file_url,
+            status: 'draft'
+          },
+          { new: true, runValidators: true }
+        );
+      } else {
+        // Create new session
+        session = new Session({
+          user_id: req.user._id,
+          title,
+          tags: Array.isArray(tags) ? tags.filter(tag => tag.trim()) : [],
+          json_file_url,
+          status: 'draft'
+        });
+
+        await session.save();
+      }
     }
 
     res.json({
