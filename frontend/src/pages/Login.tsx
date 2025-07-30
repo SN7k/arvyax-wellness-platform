@@ -44,7 +44,7 @@ const Login: React.FC = () => {
     const success = await login(formData.email, formData.password);
     
     if (success) {
-      toast.success('Welcome back!');
+      toast.success('Welcome!');
     } else {
       toast.error('Invalid email or password');
     }
