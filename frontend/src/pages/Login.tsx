@@ -44,7 +44,7 @@ const Login: React.FC = () => {
     const success = await login(formData.email, formData.password);
     
     if (success) {
-      toast.success('Welcome!');
+      toast.success('Welcome back!');
     } else {
       toast.error('Invalid email or password');
     }
@@ -68,7 +68,7 @@ const Login: React.FC = () => {
           <div className="mx-auto w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center mb-6">
             <Leaf className="h-8 w-8 text-emerald-600" />
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome back</h2>
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome to Arvyax</h2>
           <p className="text-gray-600">Sign in to your Arvyax Wellness account</p>
         </div>
 
