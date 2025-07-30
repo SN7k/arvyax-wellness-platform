@@ -1,5 +1,10 @@
 # Arvyax Wellness Platform [🌐 Live Demo](https://arvyaxwellness.netlify.app/)
 
+<h2 align="center">🎥 App Demo</h2>
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/69b1d811-1f3e-4867-bb41-1962379595ef" width="500" />
+</p>
+
 ---
 
 ## 🌿 Features
