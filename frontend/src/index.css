@@ -39,6 +39,19 @@
     animation: slideInDown 0.5s ease-out forwards;
   }
   
+  /* Responsive text truncation */
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  /* Ensure buttons don't shrink too much */
+  .min-button-width {
+    min-width: 60px;
+  }
+  
   @keyframes slideInRight {
     from {
       opacity: 0;
