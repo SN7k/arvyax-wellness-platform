@@ -123,28 +123,6 @@ const MySessions: React.FC = () => {
             </div>
           )}
         </div>
-
-        {/* Quick Actions */}
-        {currentSessions.length > 0 && (
-          <div className="mt-8 sm:mt-12 p-4 sm:p-6 bg-white rounded-xl border border-gray-100">
-            <div className="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between text-center sm:text-left">
-              <div>
-                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-1">
-                  Ready to create more?
-                </h3>
-                <p className="text-sm sm:text-base text-gray-600">
-                  Share your wellness expertise with the community
-                </p>
-              </div>
-              <button
-                onClick={() => navigate('/editor')}
-                className="btn-primary w-full sm:w-auto px-6 py-3 text-sm sm:text-base"
-              >
-                Create New Session
-              </button>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
