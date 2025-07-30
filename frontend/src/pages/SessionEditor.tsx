@@ -87,7 +87,7 @@ const SessionEditor: React.FC = () => {
       title: formData.title.trim(),
       tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
       json_file_url: formData.json_file_url.trim(),
-      sessionId: isEditing && id ? id : undefined
+      sessionId: id || undefined // Use id directly (from URL params)
     };
 
     // Only show toast if component is still mounted and it's not a published session being auto-saved
@@ -120,39 +120,50 @@ const SessionEditor: React.FC = () => {
         title: formData.title.trim(),
         tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
         json_file_url: formData.json_file_url.trim(),
-        sessionId: isEditing && id ? id : undefined
+        sessionId: id || undefined // Use id directly (from URL params)
       };
 
-      // Don't show toast for saveDraft when we're going to publish
-      const result = await saveDraft(sessionData, !shouldPublish);
-
-      if (result) {
-        setLastSaved(new Date());
-
-        if (shouldPublish) {
-          // Check if it's already published
-          if (sessionStatus === 'published') {
-            // For published sessions, just update without republishing
-            setSessionStatus('published');
-            toast.success('Session updated successfully!');
-          } else {
-            // For draft sessions, publish them (don't show publishSession toast)
-            const publishResult = await publishSession(result._id, false);
+      if (shouldPublish) {
+        // For publishing: save/update first (without showing toast), then publish
+        const result = await saveDraft(sessionData, false);
+        
+        if (result) {
+          setLastSaved(new Date());
+          
+          // If it's a new session, update the URL and set editing mode
+          if (!isEditing && result._id) {
+            navigate(`/editor/${result._id}`, { replace: true });
+            setIsEditing(true);
+          }
+          
+          // Now publish the session
+          const sessionIdToPublish = result._id || id;
+          if (sessionIdToPublish) {
+            const publishResult = await publishSession(sessionIdToPublish, false);
             if (publishResult) {
               setSessionStatus('published');
               toast.success('Session published successfully!');
+            } else {
+              toast.error('Failed to publish session');
             }
           }
-        } else {
-          // Save as draft - toast already shown by saveDraft
-          if (!isEditing) {
-            // New session saved as draft
+        }
+      } else {
+        // Save as draft (show toast)
+        const result = await saveDraft(sessionData, true);
+        
+        if (result) {
+          setLastSaved(new Date());
+          
+          // If it's a new session, update the URL and set editing mode
+          if (!isEditing && result._id) {
             navigate(`/editor/${result._id}`, { replace: true });
             setIsEditing(true);
           }
         }
       }
     } catch (error) {
+      console.error('Save error:', error);
       toast.error('Failed to save session');
     } finally {
       setIsSaving(false);

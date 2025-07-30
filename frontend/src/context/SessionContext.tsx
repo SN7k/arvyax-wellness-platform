@@ -220,17 +220,17 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
       const data = await response.json();
 
       if (data.success) {
-        // Update local state
+        // Update local state with the returned session data
         setSessions(prev => 
           prev.map(session => 
-            session._id === sessionId ? { ...session, status: 'published' } : session
+            session._id === sessionId ? data.data : session
           )
         );
         
         if (showToast) {
           toast.success(data.message);
         }
-        return true;
+        return data.data; // Return the updated session data
       } else {
         if (showToast) {
           toast.error(data.message || 'Failed to publish session');
