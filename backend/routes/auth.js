@@ -159,9 +159,11 @@ router.get('/me', async (req, res) => {
 // @access  Public
 router.post('/demo-login', async (req, res) => {
   try {
+    // Demo credentials - hardcoded for demo purposes only
+    // In production, consider using environment variables or disabling this endpoint
     const demoEmail = 'demo@arvyax.com';
     const demoName = 'Demo User';
-    const demoPassword = 'demo123456';
+    const demoPassword = 'demo123456'; // Will be hashed by User model pre-save hook
 
     // Check if demo user already exists
     let user = await User.findOne({ email: demoEmail });
@@ -170,7 +172,7 @@ router.post('/demo-login', async (req, res) => {
     if (!user) {
       user = new User({
         email: demoEmail,
-        password_hash: demoPassword,
+        password_hash: demoPassword, // Password will be auto-hashed by pre-save middleware
         name: demoName
       });
       await user.save();
