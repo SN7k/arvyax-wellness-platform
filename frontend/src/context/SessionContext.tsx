@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import toast from 'react-hot-toast';
-import { mockSessions } from '../data/mockData';
+import { mockSessions, mockDemoUser } from '../data/mockData';
 import { useAuth } from './AuthContext';
 
 export interface Session {
@@ -58,6 +58,20 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
     };
   };
 
+  // Helper function to create mock session for demo mode
+  const createMockSession = (sessionData: { title: string; tags: string[]; json_file_url: string; sessionId?: string }): Session => {
+    return {
+      _id: sessionData.sessionId || `session-demo-${Date.now()}`,
+      user_id: mockDemoUser.id,
+      title: sessionData.title,
+      tags: sessionData.tags,
+      json_file_url: sessionData.json_file_url,
+      status: 'draft',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+  };
+
   // Fetch user's own sessions (draft + published)
   const fetchUserSessions = async () => {
     setLoading(true);
@@ -65,8 +79,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
     // Use mock data in demo mode
     if (isDemoMode) {
       await new Promise(resolve => setTimeout(resolve, 300)); // Simulate network delay
-      const demoUserId = 'demo-user-12345';
-      const userSessions = mockSessions.filter(s => s.user_id === demoUserId);
+      const userSessions = mockSessions.filter(s => s.user_id === mockDemoUser.id);
       setSessions(userSessions);
       setLoading(false);
       return;
@@ -128,16 +141,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
     if (isDemoMode) {
       await new Promise(resolve => setTimeout(resolve, 300)); // Simulate network delay
       
-      const newSession: Session = {
-        _id: sessionData.sessionId || `session-demo-${Date.now()}`,
-        user_id: 'demo-user-12345',
-        title: sessionData.title,
-        tags: sessionData.tags,
-        json_file_url: sessionData.json_file_url,
-        status: 'draft',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      };
+      const newSession = createMockSession(sessionData);
       
       setSessions(prev => {
         if (sessionData.sessionId) {
@@ -205,16 +209,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
     if (isDemoMode) {
       await new Promise(resolve => setTimeout(resolve, 300)); // Simulate network delay
       
-      const newSession: Session = {
-        _id: sessionData.sessionId || `session-demo-${Date.now()}`,
-        user_id: 'demo-user-12345',
-        title: sessionData.title,
-        tags: sessionData.tags,
-        json_file_url: sessionData.json_file_url,
-        status: 'draft',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      };
+      const newSession = createMockSession(sessionData);
       
       setSessions(prev => {
         if (sessionData.sessionId) {
