@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { mockDemoUser, mockDemoToken } from '../data/mockData';
 
 interface User {
   id: string;
@@ -13,6 +14,7 @@ interface AuthContextType {
   demoLogin: () => Promise<boolean>;
   logout: () => void;
   isLoading: boolean;
+  isDemoMode: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -34,14 +36,17 @@ const API_BASE_URL = 'https://arvyax-wellness-platform-js0w.onrender.com/api';
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isDemoMode, setIsDemoMode] = useState(false);
 
   useEffect(() => {
     // Check for existing session
     const token = localStorage.getItem('token');
     const savedUser = localStorage.getItem('user');
+    const demoMode = localStorage.getItem('demoMode') === 'true';
     
     if (token && savedUser) {
       setUser(JSON.parse(savedUser));
+      setIsDemoMode(demoMode);
     }
     setIsLoading(false);
   }, []);
@@ -123,32 +128,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const demoLogin = async (): Promise<boolean> => {
     setIsLoading(true);
     
+    // Simulate a brief loading delay for better UX
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/demo-login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        const userData = {
-          id: data.user.id,
-          email: data.user.email,
-          name: data.user.name
-        };
-        
-        setUser(userData);
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(userData));
-        setIsLoading(false);
-        return true;
-      } else {
-        setIsLoading(false);
-        return false;
-      }
+      // Use mock data - no backend connection needed
+      const userData = {
+        id: mockDemoUser.id,
+        email: mockDemoUser.email,
+        name: mockDemoUser.name
+      };
+      
+      setUser(userData);
+      setIsDemoMode(true);
+      localStorage.setItem('token', mockDemoToken);
+      localStorage.setItem('user', JSON.stringify(userData));
+      localStorage.setItem('demoMode', 'true');
+      setIsLoading(false);
+      return true;
     } catch (error) {
       console.error('Demo login error:', error);
       setIsLoading(false);
@@ -158,8 +155,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = () => {
     setUser(null);
+    setIsDemoMode(false);
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.removeItem('demoMode');
   };
 
   const value = {
@@ -168,7 +167,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     register,
     demoLogin,
     logout,
-    isLoading
+    isLoading,
+    isDemoMode
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
