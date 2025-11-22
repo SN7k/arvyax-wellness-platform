@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import toast from 'react-hot-toast';
+import { mockSessions, mockDemoUser } from '../data/mockData';
+import { useAuth } from './AuthContext';
 
 export interface Session {
   _id: string;
@@ -45,6 +47,7 @@ const API_BASE_URL = 'https://arvyax-wellness-platform-js0w.onrender.com/api';
 export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(false);
+  const { isDemoMode } = useAuth();
 
   // Helper function to get auth headers
   const getAuthHeaders = () => {
@@ -55,9 +58,33 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
     };
   };
 
+  // Helper function to create mock session for demo mode
+  const createMockSession = (sessionData: { title: string; tags: string[]; json_file_url: string; sessionId?: string }): Session => {
+    return {
+      _id: sessionData.sessionId || `session-demo-${Date.now()}`,
+      user_id: mockDemoUser.id,
+      title: sessionData.title,
+      tags: sessionData.tags,
+      json_file_url: sessionData.json_file_url,
+      status: 'draft',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+  };
+
   // Fetch user's own sessions (draft + published)
   const fetchUserSessions = async () => {
     setLoading(true);
+    
+    // Use mock data in demo mode
+    if (isDemoMode) {
+      await new Promise(resolve => setTimeout(resolve, 300)); // Simulate network delay
+      const userSessions = mockSessions.filter(s => s.user_id === mockDemoUser.id);
+      setSessions(userSessions);
+      setLoading(false);
+      return;
+    }
+    
     try {
       const response = await fetch(`${API_BASE_URL}/sessions/my-sessions`, {
         headers: getAuthHeaders(),
@@ -81,6 +108,16 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
   // Fetch published sessions (public)
   const fetchPublishedSessions = async () => {
     setLoading(true);
+    
+    // Use mock data in demo mode
+    if (isDemoMode) {
+      await new Promise(resolve => setTimeout(resolve, 300)); // Simulate network delay
+      const publishedSessions = mockSessions.filter(s => s.status === 'published');
+      setSessions(publishedSessions);
+      setLoading(false);
+      return;
+    }
+    
     try {
       const response = await fetch(`${API_BASE_URL}/sessions`);
       const data = await response.json();
@@ -100,6 +137,30 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
 
   // Save or update a draft session
   const saveDraft = async (sessionData: { title: string; tags: string[]; json_file_url: string; sessionId?: string }, showToast: boolean = true) => {
+    // Use mock data in demo mode
+    if (isDemoMode) {
+      await new Promise(resolve => setTimeout(resolve, 300)); // Simulate network delay
+      
+      const newSession = createMockSession(sessionData);
+      
+      setSessions(prev => {
+        if (sessionData.sessionId) {
+          // Update existing session
+          return prev.map(session => 
+            session._id === sessionData.sessionId ? newSession : session
+          );
+        } else {
+          // Add new session
+          return [...prev, newSession];
+        }
+      });
+      
+      if (showToast) {
+        toast.success('Draft saved successfully (Demo Mode)');
+      }
+      return newSession;
+    }
+    
     try {
       const response = await fetch(`${API_BASE_URL}/sessions/my-sessions/save-draft`, {
         method: 'POST',
@@ -144,6 +205,45 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
 
   // Auto-save functionality with toast feedback
   const autoSaveDraft = async (sessionData: { title: string; tags: string[]; json_file_url: string; sessionId?: string }, showToast: boolean = true) => {
+    // Use mock data in demo mode
+    if (isDemoMode) {
+      await new Promise(resolve => setTimeout(resolve, 300)); // Simulate network delay
+      
+      const newSession = createMockSession(sessionData);
+      
+      setSessions(prev => {
+        if (sessionData.sessionId) {
+          return prev.map(session => 
+            session._id === sessionData.sessionId ? newSession : session
+          );
+        } else {
+          return [...prev, newSession];
+        }
+      });
+      
+      if (showToast) {
+        toast.success('Draft saved automatically (Demo Mode)', { 
+          duration: 3000,
+          icon: '✓',
+          style: {
+            background: '#f0f9ff',
+            color: '#1e40af',
+            border: '1px solid #3b82f6',
+            borderRadius: '8px',
+            fontSize: '14px',
+            fontWeight: '500',
+            boxShadow: '0 4px 12px rgba(59, 130, 246, 0.15)',
+          },
+          iconTheme: {
+            primary: '#10b981',
+            secondary: '#ffffff',
+          }
+        });
+      }
+      
+      return newSession;
+    }
+    
     try {
       const response = await fetch(`${API_BASE_URL}/sessions/my-sessions/save-draft`, {
         method: 'POST',
@@ -210,6 +310,26 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
 
   // Publish a session
   const publishSession = async (sessionId: string, showToast: boolean = true) => {
+    // Use mock data in demo mode
+    if (isDemoMode) {
+      await new Promise(resolve => setTimeout(resolve, 300)); // Simulate network delay
+      
+      setSessions(prev => 
+        prev.map(session => 
+          session._id === sessionId 
+            ? { ...session, status: 'published' as 'draft' | 'published', updated_at: new Date().toISOString() } 
+            : session
+        )
+      );
+      
+      if (showToast) {
+        toast.success('Session published successfully (Demo Mode)');
+      }
+      
+      const updatedSession = sessions.find(s => s._id === sessionId);
+      return updatedSession ? { ...updatedSession, status: 'published' as 'draft' | 'published' } : false;
+    }
+    
     try {
       const response = await fetch(`${API_BASE_URL}/sessions/my-sessions/publish`, {
         method: 'POST',
@@ -248,6 +368,15 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
 
   // Delete a session
   const deleteSession = async (sessionId: string) => {
+    // Use mock data in demo mode
+    if (isDemoMode) {
+      await new Promise(resolve => setTimeout(resolve, 300)); // Simulate network delay
+      
+      setSessions(prev => prev.filter(session => session._id !== sessionId));
+      toast.success('Session deleted successfully (Demo Mode)');
+      return true;
+    }
+    
     try {
       const response = await fetch(`${API_BASE_URL}/sessions/my-sessions/${sessionId}`, {
         method: 'DELETE',
