@@ -5,7 +5,7 @@ import { Eye, EyeOff, Leaf } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const Login: React.FC = () => {
-  const { user, login, isLoading } = useAuth();
+  const { user, login, demoLogin, isLoading } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -57,6 +57,16 @@ const Login: React.FC = () => {
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
+
+  const handleDemoLogin = async () => {
+    const success = await demoLogin();
+    
+    if (success) {
+      toast.success('Welcome to the demo!');
+    } else {
+      toast.error('Demo login failed. Please try again.');
     }
   };
 
@@ -129,6 +139,26 @@ const Login: React.FC = () => {
             className="btn-primary w-full"
           >
             {isLoading ? 'Signing in...' : 'Sign in'}
+          </button>
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-gradient-to-br from-emerald-50 via-white to-emerald-50 text-gray-500">
+                Or
+              </span>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleDemoLogin}
+            disabled={isLoading}
+            className="w-full flex justify-center items-center py-3 px-4 border border-emerald-600 rounded-xl shadow-sm text-sm font-medium text-emerald-600 bg-white hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isLoading ? 'Loading...' : 'Try Demo Login'}
           </button>
 
           <div className="text-center">

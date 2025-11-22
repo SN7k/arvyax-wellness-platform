@@ -154,4 +154,54 @@ router.get('/me', async (req, res) => {
   }
 });
 
+// @desc    Demo login - bypass authentication for demo purposes
+// @route   POST /api/auth/demo-login
+// @access  Public
+router.post('/demo-login', async (req, res) => {
+  try {
+    // Demo credentials - hardcoded for demo purposes only
+    // In production, consider using environment variables or disabling this endpoint
+    const demoEmail = 'demo@arvyax.com';
+    const demoName = 'Demo User';
+    const demoPassword = 'demo123456'; // Will be hashed by User model pre-save hook
+
+    // Check if demo user already exists
+    let user = await User.findOne({ email: demoEmail });
+
+    // If not, create demo user
+    if (!user) {
+      user = new User({
+        email: demoEmail,
+        password_hash: demoPassword, // Password will be auto-hashed by pre-save middleware
+        name: demoName
+      });
+      await user.save();
+    }
+
+    // Create JWT token
+    const token = jwt.sign(
+      { userId: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN }
+    );
+
+    res.json({
+      success: true,
+      message: 'Demo login successful',
+      token,
+      user: {
+        id: user._id,
+        email: user.email,
+        name: user.name
+      }
+    });
+  } catch (error) {
+    console.error('Demo login error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error during demo login'
+    });
+  }
+});
+
 export default router;
